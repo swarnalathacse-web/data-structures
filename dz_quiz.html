@@ -1,0 +1,672 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structures Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f9f7f4;
+    color: #2c2c2a;
+    min-height: 100vh;
+    padding: 2.5rem 1.25rem;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 2rem 1rem 1.8rem;
+    border-bottom: 0.5px solid #d3d1c7;
+    margin-bottom: 2rem;
+  }
+  .pill {
+    display: inline-block;
+    background: #eeedfe; color: #26215c;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 4px 14px; border-radius: 99px;
+    margin-bottom: 0.9rem;
+  }
+  header h1 { font-size: 1.9rem; font-weight: 700; color: #26215c; margin-bottom: 0.35rem; }
+  header p  { font-size: 14px; color: #5f5e5a; }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: #e8e6de; border-radius: 99px;
+    height: 6px; margin-bottom: 0.5rem; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; border-radius: 99px;
+    background: #534ab7;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px; color: #888780;
+    text-align: right; margin-bottom: 2rem;
+  }
+
+  /* Quiz card */
+  .quiz-card {
+    background: #ffffff;
+    border: 0.5px solid #d3d1c7;
+    border-radius: 16px;
+    padding: 2rem 2.2rem;
+    margin-bottom: 1.5rem;
+    display: none;
+    animation: slideIn 0.25s ease;
+  }
+  .quiz-card.active { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .q-num {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #534ab7;
+    background: #eeedfe; padding: 4px 12px; border-radius: 99px;
+  }
+  .q-marks {
+    font-size: 11px; color: #888780; font-weight: 500;
+  }
+
+  .q-text {
+    font-size: 1rem; font-weight: 600; color: #2c2c2a;
+    line-height: 1.55; margin-bottom: 1.4rem;
+  }
+
+  /* Options */
+  .option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 0.85rem 1rem;
+    border: 1px solid #d3d1c7;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: #fff;
+    user-select: none;
+  }
+  .option:hover:not(.locked) { border-color: #534ab7; background: #f5f4fe; }
+
+  .option.selected { border-color: #534ab7; background: #eeedfe; }
+  .option.correct  { border-color: #3b6d11; background: #eaf3de; }
+  .option.wrong    { border-color: #993c1d; background: #faece7; }
+  .option.reveal   { border-color: #3b6d11; background: #eaf3de; }
+  .option.locked   { cursor: default; }
+
+  .opt-indicator {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid #d3d1c7;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 13px; font-weight: 700;
+    color: #888780; margin-top: 1px;
+    transition: all 0.15s;
+  }
+  .option.selected .opt-indicator { border-color: #534ab7; color: #534ab7; background: #eeedfe; }
+  .option.correct  .opt-indicator { border-color: #3b6d11; color: #fff;    background: #3b6d11; }
+  .option.wrong    .opt-indicator { border-color: #993c1d; color: #fff;    background: #993c1d; }
+  .option.reveal   .opt-indicator { border-color: #3b6d11; color: #fff;    background: #3b6d11; }
+
+  .opt-label { font-size: 14px; color: #2c2c2a; line-height: 1.55; }
+  .option.correct  .opt-label, .option.reveal .opt-label { color: #27500a; font-weight: 500; }
+  .option.wrong    .opt-label { color: #712b13; font-weight: 500; }
+
+  /* Explanation box */
+  .explanation {
+    display: none;
+    margin-top: 1rem;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-size: 13.5px;
+    line-height: 1.65;
+    animation: fadeExp 0.2s ease;
+  }
+  .explanation.show { display: block; }
+  .explanation.correct-exp {
+    background: #eaf3de; color: #1e4d08;
+    border: 0.5px solid #b3d98a;
+  }
+  .explanation.wrong-exp {
+    background: #faece7; color: #5a1f0a;
+    border: 0.5px solid #f0b89f;
+  }
+  .explanation strong { font-weight: 700; }
+
+  @keyframes fadeExp { from { opacity:0; } to { opacity:1; } }
+
+  /* Nav buttons */
+  .nav-row {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-top: 1.5rem;
+  }
+
+  .btn {
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: background 0.15s;
+  }
+  .btn-primary { background: #534ab7; color: #fff; }
+  .btn-primary:hover { background: #3c3489; }
+  .btn-primary:disabled { background: #c9c6f5; cursor: default; }
+  .btn-outline {
+    background: transparent; color: #534ab7;
+    border: 1px solid #534ab7;
+  }
+  .btn-outline:hover { background: #eeedfe; }
+  .btn-ghost { background: transparent; color: #888780; border: none; cursor: default; }
+
+  /* Result screen */
+  #result-screen {
+    display: none;
+    background: #ffffff;
+    border: 0.5px solid #d3d1c7;
+    border-radius: 16px;
+    padding: 2.5rem 2.2rem;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+  }
+  #result-screen.show { display: block; }
+
+  .score-circle {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-weight: 700;
+  }
+  .score-circle .big { font-size: 2rem; line-height: 1; }
+  .score-circle .small { font-size: 12px; margin-top: 2px; opacity: 0.8; }
+
+  .score-excellent { background: #eaf3de; color: #27500a; border: 2px solid #b3d98a; }
+  .score-good      { background: #eeedfe; color: #26215c; border: 2px solid #c9c6f5; }
+  .score-low       { background: #faece7; color: #712b13; border: 2px solid #f0b89f; }
+
+  #result-screen h2 { font-size: 1.5rem; font-weight: 700; color: #26215c; margin-bottom: 0.4rem; }
+  #result-screen .sub { font-size: 14px; color: #5f5e5a; margin-bottom: 1.8rem; }
+
+  .summary-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 2rem;
+  }
+  .summary-box {
+    background: #f9f7f4; border: 0.5px solid #d3d1c7;
+    border-radius: 10px; padding: 0.85rem 0.5rem;
+    text-align: center;
+  }
+  .summary-box .val { font-size: 1.4rem; font-weight: 700; color: #2c2c2a; }
+  .summary-box .lbl { font-size: 11px; color: #888780; margin-top: 3px; }
+  .val-green { color: #27500a !important; }
+  .val-red   { color: #712b13 !important; }
+
+  /* Review section */
+  .review-title {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #888780;
+    text-align: left; margin-bottom: 0.9rem;
+    border-top: 0.5px solid #d3d1c7; padding-top: 1.5rem;
+  }
+
+  .review-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #f9f7f4; border: 0.5px solid #d3d1c7;
+    border-radius: 10px; padding: 0.75rem 1rem;
+    margin-bottom: 8px; text-align: left;
+    font-size: 13px;
+  }
+  .review-icon { font-size: 16px; flex-shrink: 0; }
+  .review-q { font-weight: 500; color: #2c2c2a; flex: 1; }
+  .review-tag {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 99px; flex-shrink: 0;
+  }
+  .tag-correct { background: #eaf3de; color: #27500a; }
+  .tag-wrong   { background: #faece7; color: #712b13; }
+
+  .retry-btn {
+    background: #534ab7; color: #fff;
+    border: none; border-radius: 8px;
+    padding: 11px 28px; font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-top: 1.5rem;
+  }
+  .retry-btn:hover { background: #3c3489; }
+
+  footer {
+    text-align: center; font-size: 12px; color: #aaa9a3;
+    margin-top: 2.5rem; padding-top: 1.5rem;
+    border-top: 0.5px solid #d3d1c7;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="pill">II Year B.Tech · Data Structures</div>
+    <h1>Data Structures Quiz</h1>
+    <p>5 questions · 1 mark each · Total: 5 marks</p>
+  </header>
+
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+  <div class="progress-label" id="progress-label">Question 0 of 5</div>
+
+  <!-- Q1 -->
+  <div class="quiz-card active" id="card-1">
+    <div class="q-meta">
+      <span class="q-num">Question 1</span>
+      <span class="q-marks">1 mark</span>
+    </div>
+    <div class="q-text">Which of the following best defines a Data Structure?</div>
+    <div class="options" id="opts-1">
+      <div class="option" onclick="select(1,'a')">
+        <div class="opt-indicator">A</div>
+        <div class="opt-label">A programming language used to write algorithms</div>
+      </div>
+      <div class="option" onclick="select(1,'b')">
+        <div class="opt-indicator">B</div>
+        <div class="opt-label">A way to organise and store data for efficient access and modification</div>
+      </div>
+      <div class="option" onclick="select(1,'c')">
+        <div class="opt-indicator">C</div>
+        <div class="opt-label">A type of computer hardware component</div>
+      </div>
+      <div class="option" onclick="select(1,'d')">
+        <div class="opt-indicator">D</div>
+        <div class="opt-label">A method to design user interfaces</div>
+      </div>
+    </div>
+    <div class="explanation" id="exp-1"></div>
+    <div class="nav-row">
+      <span class="btn btn-ghost">← Back</span>
+      <button class="btn btn-primary" id="next-1" onclick="next(1)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" id="card-2">
+    <div class="q-meta">
+      <span class="q-num">Question 2</span>
+      <span class="q-marks">1 mark</span>
+    </div>
+    <div class="q-text">A Stack follows which order of operation?</div>
+    <div class="options" id="opts-2">
+      <div class="option" onclick="select(2,'a')">
+        <div class="opt-indicator">A</div>
+        <div class="opt-label">FIFO — First In, First Out</div>
+      </div>
+      <div class="option" onclick="select(2,'b')">
+        <div class="opt-indicator">B</div>
+        <div class="opt-label">LILO — Last In, Last Out</div>
+      </div>
+      <div class="option" onclick="select(2,'c')">
+        <div class="opt-indicator">C</div>
+        <div class="opt-label">LIFO — Last In, First Out</div>
+      </div>
+      <div class="option" onclick="select(2,'d')">
+        <div class="opt-indicator">D</div>
+        <div class="opt-label">FILO — First In, Last Out only from the middle</div>
+      </div>
+    </div>
+    <div class="explanation" id="exp-2"></div>
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="back(2)">← Back</button>
+      <button class="btn btn-primary" id="next-2" onclick="next(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" id="card-3">
+    <div class="q-meta">
+      <span class="q-num">Question 3</span>
+      <span class="q-marks">1 mark</span>
+    </div>
+    <div class="q-text">What is the time complexity of accessing an element by index in an Array?</div>
+    <div class="options" id="opts-3">
+      <div class="option" onclick="select(3,'a')">
+        <div class="opt-indicator">A</div>
+        <div class="opt-label">O(n) — Linear time</div>
+      </div>
+      <div class="option" onclick="select(3,'b')">
+        <div class="opt-indicator">B</div>
+        <div class="opt-label">O(log n) — Logarithmic time</div>
+      </div>
+      <div class="option" onclick="select(3,'c')">
+        <div class="opt-indicator">C</div>
+        <div class="opt-label">O(n²) — Quadratic time</div>
+      </div>
+      <div class="option" onclick="select(3,'d')">
+        <div class="opt-indicator">D</div>
+        <div class="opt-label">O(1) — Constant time</div>
+      </div>
+    </div>
+    <div class="explanation" id="exp-3"></div>
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="back(3)">← Back</button>
+      <button class="btn btn-primary" id="next-3" onclick="next(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-card" id="card-4">
+    <div class="q-meta">
+      <span class="q-num">Question 4</span>
+      <span class="q-marks">1 mark</span>
+    </div>
+    <div class="q-text">In a Linked List, each node contains:</div>
+    <div class="options" id="opts-4">
+      <div class="option" onclick="select(4,'a')">
+        <div class="opt-indicator">A</div>
+        <div class="opt-label">Only the data value</div>
+      </div>
+      <div class="option" onclick="select(4,'b')">
+        <div class="opt-indicator">B</div>
+        <div class="opt-label">Data and a pointer to the next node</div>
+      </div>
+      <div class="option" onclick="select(4,'c')">
+        <div class="opt-indicator">C</div>
+        <div class="opt-label">Only a pointer to the next node</div>
+      </div>
+      <div class="option" onclick="select(4,'d')">
+        <div class="opt-indicator">D</div>
+        <div class="opt-label">An index and a data value</div>
+      </div>
+    </div>
+    <div class="explanation" id="exp-4"></div>
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="back(4)">← Back</button>
+      <button class="btn btn-primary" id="next-4" onclick="next(4)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-card" id="card-5">
+    <div class="q-meta">
+      <span class="q-num">Question 5</span>
+      <span class="q-marks">1 mark</span>
+    </div>
+    <div class="q-text">Which data structure is used in CPU scheduling and print spoolers?</div>
+    <div class="options" id="opts-5">
+      <div class="option" onclick="select(5,'a')">
+        <div class="opt-indicator">A</div>
+        <div class="opt-label">Stack</div>
+      </div>
+      <div class="option" onclick="select(5,'b')">
+        <div class="opt-indicator">B</div>
+        <div class="opt-label">Array</div>
+      </div>
+      <div class="option" onclick="select(5,'c')">
+        <div class="opt-indicator">C</div>
+        <div class="opt-label">Queue</div>
+      </div>
+      <div class="option" onclick="select(5,'d')">
+        <div class="opt-indicator">D</div>
+        <div class="opt-label">Binary Tree</div>
+      </div>
+    </div>
+    <div class="explanation" id="exp-5"></div>
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="back(5)">← Back</button>
+      <button class="btn btn-primary" id="next-5" onclick="finish()" disabled>Submit Quiz ✓</button>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen">
+    <div class="score-circle" id="score-circle">
+      <span class="big" id="score-big"></span>
+      <span class="small">out of 5</span>
+    </div>
+    <h2 id="result-title"></h2>
+    <p class="sub" id="result-sub"></p>
+
+    <div class="summary-row">
+      <div class="summary-box">
+        <div class="val" id="sum-score"></div>
+        <div class="lbl">Marks Scored</div>
+      </div>
+      <div class="summary-box">
+        <div class="val val-green" id="sum-correct"></div>
+        <div class="lbl">Correct</div>
+      </div>
+      <div class="summary-box">
+        <div class="val val-red" id="sum-wrong"></div>
+        <div class="lbl">Incorrect</div>
+      </div>
+    </div>
+
+    <div class="review-title">Answer Review</div>
+    <div id="review-list"></div>
+
+    <button class="retry-btn" onclick="retry()">🔄 Retry Quiz</button>
+  </div>
+
+  <footer>Data Structures · II Year B.Tech &nbsp;·&nbsp; Faculty: A. Swarna Latha</footer>
+
+</div>
+
+<script>
+  const ANSWERS = { 1:'b', 2:'c', 3:'d', 4:'b', 5:'c' };
+
+  const EXPLANATIONS = {
+    1: {
+      correct: "✅ Correct! A data structure is precisely a way to organise and store data so it can be accessed and modified efficiently. Examples include Arrays, Stacks, Queues, Trees, and Graphs.",
+      a: "❌ Incorrect. A programming language (like C, Java, or Python) is a tool to write code. Data structures are concepts about how data is organised — they are implemented using programming languages.",
+      c: "❌ Incorrect. Hardware refers to physical components like RAM or CPU. Data structures are software concepts that define how data is stored and accessed in memory, not physical hardware.",
+      d: "❌ Incorrect. User interface design is part of UI/UX. Data structures are about organising data in memory — a completely different area of computer science."
+    },
+    2: {
+      correct: "✅ Correct! A Stack follows LIFO — the last element pushed onto the stack is the first one to be popped off. Think of a pile of plates: you add and remove from the top only.",
+      a: "❌ Incorrect. FIFO (First In, First Out) is the behaviour of a Queue, not a Stack. In a Queue, the element that arrives first is served first — like a line at a counter.",
+      b: "❌ Incorrect. LILO is not a valid or standard term in data structures. The correct terms are LIFO (Stack) and FIFO (Queue).",
+      d: "❌ Incorrect. FILO is another way of saying LIFO (which is correct for a Stack), but 'only from the middle' is wrong. A Stack only allows operations at the top, never from the middle."
+    },
+    3: {
+      correct: "✅ Correct! Arrays store elements in contiguous memory locations. Since each element's address = base address + (index × element size), the CPU can jump directly to any element in one step — O(1) constant time.",
+      a: "❌ Incorrect. O(n) means you'd have to scan through elements one by one. That's how searching in an unsorted array works, but not index-based access. Arrays give direct access via index.",
+      b: "❌ Incorrect. O(log n) is the complexity for Binary Search on a sorted array. Direct index-based access doesn't need any searching at all — it's a direct memory calculation.",
+      c: "❌ Incorrect. O(n²) applies to nested-loop algorithms like Bubble Sort. Accessing a single array element by its index requires just one calculation, not any loops."
+    },
+    4: {
+      correct: "✅ Correct! Each node in a Linked List has two parts: (1) Data — the value stored, and (2) Next pointer — the memory address of the next node. This is what forms the chain.",
+      a: "❌ Incorrect. If a node had only data with no pointer, it wouldn't be able to connect to the next node. The linked structure would not exist — it would just be isolated values in memory.",
+      c: "❌ Incorrect. A node must store actual data, not just a pointer. A pointer-only node would be useless since you'd have nothing to retrieve — just an address pointing to another address.",
+      d: "❌ Incorrect. Indexes are used in Arrays where elements are stored in contiguous memory. Linked Lists don't use indexes — they navigate using pointers, which is what makes them dynamic."
+    },
+    5: {
+      correct: "✅ Correct! CPU scheduling and print spoolers use a Queue because of its FIFO (First In, First Out) property — the first process or print job that arrives is the first one to be served.",
+      a: "❌ Incorrect. A Stack (LIFO) would mean the most recently added job gets processed first, which is unfair for scheduling. CPU and print tasks must be handled in the order they arrive.",
+      b: "❌ Incorrect. An Array doesn't inherently manage the order of job processing. You'd need extra logic to add/remove from specific ends, whereas a Queue provides this natively.",
+      d: "❌ Incorrect. A Binary Tree is used for hierarchical data, searching (BST), and priority queues. Basic CPU scheduling and print spoolers need simple ordered processing — a Queue is the right fit."
+    }
+  };
+
+  const QUESTIONS = [
+    "Which of the following best defines a Data Structure?",
+    "A Stack follows which order of operation?",
+    "Time complexity of accessing an element by index in an Array?",
+    "In a Linked List, each node contains:",
+    "Which data structure is used in CPU scheduling and print spoolers?"
+  ];
+
+  const userAnswers = {};
+  let current = 1;
+
+  function updateProgress(q) {
+    const pct = ((q - 1) / 5) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = 'Question ' + (q - 1) + ' of 5';
+  }
+
+  function select(qNum, choice) {
+    const container = document.getElementById('opts-' + qNum);
+    if (container.classList.contains('locked')) return;
+
+    const correct = ANSWERS[qNum];
+    userAnswers[qNum] = choice;
+    container.classList.add('locked');
+
+    const opts = container.querySelectorAll('.option');
+    const labels = ['a','b','c','d'];
+
+    opts.forEach((opt, i) => {
+      opt.classList.add('locked');
+      const lbl = labels[i];
+      if (lbl === correct) {
+        opt.classList.add('reveal');
+        opt.querySelector('.opt-indicator').textContent = '✓';
+      }
+      if (lbl === choice && choice !== correct) {
+        opt.classList.add('wrong');
+        opt.querySelector('.opt-indicator').textContent = '✗';
+      }
+      if (lbl === choice && choice === correct) {
+        opt.classList.remove('reveal');
+        opt.classList.add('correct');
+        opt.querySelector('.opt-indicator').textContent = '✓';
+      }
+    });
+
+    // Show explanation
+    const expEl = document.getElementById('exp-' + qNum);
+    expEl.classList.add('show');
+    if (choice === correct) {
+      expEl.classList.add('correct-exp');
+      expEl.innerHTML = EXPLANATIONS[qNum].correct;
+    } else {
+      expEl.classList.add('wrong-exp');
+      expEl.innerHTML = EXPLANATIONS[qNum][choice];
+    }
+
+    document.getElementById('next-' + qNum).disabled = false;
+  }
+
+  function next(qNum) {
+    document.getElementById('card-' + qNum).classList.remove('active');
+    const nextNum = qNum + 1;
+    document.getElementById('card-' + nextNum).classList.add('active');
+    current = nextNum;
+    updateProgress(nextNum);
+    document.getElementById('card-' + nextNum).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function back(qNum) {
+    document.getElementById('card-' + qNum).classList.remove('active');
+    const prevNum = qNum - 1;
+    document.getElementById('card-' + prevNum).classList.add('active');
+    current = prevNum;
+    updateProgress(prevNum);
+  }
+
+  function finish() {
+    document.getElementById('card-5').classList.remove('active');
+    document.getElementById('progress-bar').style.width = '100%';
+    document.getElementById('progress-label').textContent = 'Quiz Complete';
+
+    let score = 0;
+    for (let i = 1; i <= 5; i++) {
+      if (userAnswers[i] === ANSWERS[i]) score++;
+    }
+
+    const wrong = 5 - score;
+
+    // Circle
+    const circle = document.getElementById('score-circle');
+    document.getElementById('score-big').textContent = score;
+    if (score === 5) {
+      circle.className = 'score-circle score-excellent';
+    } else if (score >= 3) {
+      circle.className = 'score-circle score-good';
+    } else {
+      circle.className = 'score-circle score-low';
+    }
+
+    // Title & sub
+    const titles = ['Needs more practice!', 'Needs more practice!', 'Needs more practice!', 'Good effort!', 'Great job!', 'Excellent! Perfect score! 🎉'];
+    const subs = [
+      'You scored 0/5. Revisit the topic notes and try again.',
+      'You scored 1/5. Review the concepts and give it another shot.',
+      'You scored 2/5. You\'re getting there — study the explanations above.',
+      'You scored 3/5. Solid foundation! Review the incorrect answers.',
+      'You scored 4/5. Almost perfect — check what you missed.',
+      'You scored 5/5. You have mastered the basics of Data Structures!'
+    ];
+    document.getElementById('result-title').textContent = titles[score];
+    document.getElementById('result-sub').textContent = subs[score];
+
+    document.getElementById('sum-score').textContent = score + '/5';
+    document.getElementById('sum-correct').textContent = score;
+    document.getElementById('sum-wrong').textContent = wrong;
+
+    // Review list
+    const reviewList = document.getElementById('review-list');
+    reviewList.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const isCorrect = userAnswers[i] === ANSWERS[i];
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML =
+        '<span class="review-icon">' + (isCorrect ? '✅' : '❌') + '</span>' +
+        '<span class="review-q">Q' + i + '. ' + QUESTIONS[i-1] + '</span>' +
+        '<span class="review-tag ' + (isCorrect ? 'tag-correct' : 'tag-wrong') + '">' +
+        (isCorrect ? '+1 mark' : '0 marks') + '</span>';
+      reviewList.appendChild(div);
+    }
+
+    const result = document.getElementById('result-screen');
+    result.classList.add('show');
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function retry() {
+    // Reset answers
+    for (let key in userAnswers) delete userAnswers[key];
+
+    // Reset all cards
+    for (let i = 1; i <= 5; i++) {
+      const card = document.getElementById('card-' + i);
+      card.classList.remove('active');
+
+      const opts = document.getElementById('opts-' + i);
+      opts.classList.remove('locked');
+      opts.querySelectorAll('.option').forEach((opt, idx) => {
+        opt.className = 'option';
+        opt.querySelector('.opt-indicator').textContent = ['A','B','C','D'][idx];
+        opt.setAttribute('onclick', 'select(' + i + ',' + JSON.stringify(['a','b','c','d'][idx]) + ')');
+      });
+
+      const exp = document.getElementById('exp-' + i);
+      exp.className = 'explanation';
+      exp.innerHTML = '';
+
+      document.getElementById('next-' + i).disabled = true;
+    }
+
+    document.getElementById('result-screen').classList.remove('show');
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('progress-label').textContent = 'Question 0 of 5';
+    document.getElementById('card-1').classList.add('active');
+    current = 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Init
+  updateProgress(1);
+</script>
+</body>
+</html>
