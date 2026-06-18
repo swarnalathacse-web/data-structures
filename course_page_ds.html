@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Page — Data Structures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 3rem 2rem;
+  }
+
+  .page { max-width: 920px; margin: 0 auto; }
+
+  h1 { font-size: 2.8rem; font-weight: 700; color: #111; margin-bottom: 0.4rem; }
+  .faculty { font-size: 1.1rem; color: #666; margin-bottom: 2.5rem; }
+
+  table { width: 100%; border-collapse: collapse; border: 1.5px solid #111; margin-bottom: 3rem; }
+  th { font-size: 1.05rem; font-weight: 700; padding: 1rem 1.5rem; border: 1px solid #111; text-align: center; background: #fff; }
+  td { border: 1px solid #111; padding: 1.2rem 1.5rem; text-align: center; }
+  td a { color: #1a55cc; text-decoration: underline; font-size: 1.05rem; font-weight: 500; cursor: pointer; }
+  td a:hover { color: #0d3a9e; }
+
+  .panel {
+    display: none; background: #f9f7f4; border: 0.5px solid #d3d1c7;
+    border-radius: 14px; padding: 2rem 2.5rem; margin-bottom: 1.5rem;
+    animation: fadeIn 0.22s ease;
+  }
+  .panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  .panel h2 { font-size: 1.45rem; font-weight: 700; color: #26215c; margin-bottom: 0.35rem; }
+  .panel .tagline { font-size: 0.88rem; color: #888780; margin-bottom: 1.5rem; }
+  .panel p { font-size: 0.93rem; line-height: 1.75; color: #444; margin-bottom: 1.1rem; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-bottom: 1.4rem; }
+  .card { background: #fff; border: 0.5px solid #d3d1c7; border-radius: 11px; padding: 1rem 1.1rem; }
+  .card-head { display: flex; align-items: center; gap: 9px; margin-bottom: 0.6rem; }
+  .icon-wrap { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .card h4 { font-size: 13px; font-weight: 600; color: #2c2c2a; }
+  .card .sub { font-size: 11px; color: #888780; margin-top: 1px; }
+  .card p { font-size: 12.5px; color: #5f5e5a; line-height: 1.6; margin: 0; }
+
+  .c-purple .icon-wrap { background:#eeedfe; color:#534ab7; }
+  .c-teal   .icon-wrap { background:#e1f5ee; color:#0f6e56; }
+  .c-blue   .icon-wrap { background:#e6f1fb; color:#185fa5; }
+  .c-amber  .icon-wrap { background:#faeeda; color:#854f0b; }
+  .c-coral  .icon-wrap { background:#faece7; color:#993c1d; }
+  .c-green  .icon-wrap { background:#eaf3de; color:#3b6d11; }
+  .c-gray   .icon-wrap { background:#f1efe8; color:#5f5e5a; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.7rem; }
+  .tag { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; }
+  .tag.purple { background:#eeedfe; color:#26215c; }
+  .tag.teal   { background:#e1f5ee; color:#085041; }
+  .tag.blue   { background:#e6f1fb; color:#0c447c; }
+  .tag.amber  { background:#faeeda; color:#633806; }
+  .tag.coral  { background:#faece7; color:#712b13; }
+  .tag.green  { background:#eaf3de; color:#27500a; }
+  .tag.gray   { background:#f1efe8; color:#2c2c2a; }
+
+  .ds-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin: 0.55rem 0 0.75rem; }
+  .ds-box { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500; padding:6px 12px; border-radius:7px; background:#eeedfe; color:#26215c; border:1px solid #c9c6f5; }
+  .ds-box.teal  { background:#e1f5ee; color:#085041; border-color:#a8dece; }
+  .ds-box.amber { background:#faeeda; color:#633806; border-color:#e3c98a; }
+  .ds-box.coral { background:#faece7; color:#712b13; border-color:#f0b89f; }
+  .ds-box.gray  { background:#f1efe8; color:#5f5e5a; border-color:#d3d1c7; }
+  .ds-arrow { font-size:13px; color:#888780; padding:0 4px; }
+
+  .comp-wrap { background:#fff; border:0.5px solid #d3d1c7; border-radius:11px; overflow:hidden; margin-bottom:1.2rem; }
+  .comp-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .comp-table thead tr { background:#f9f7f4; }
+  .comp-table th { text-align:left; padding:9px 13px; font-weight:600; font-size:11.5px; color:#2c2c2a; border-bottom:0.5px solid #d3d1c7; }
+  .comp-table td { padding:8px 13px; color:#5f5e5a; border-bottom:0.5px solid #eceae3; }
+  .comp-table tr:last-child td { border-bottom:none; }
+  .mono { font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:500; padding:2px 7px; border-radius:5px; }
+  .good { color:#27500a; background:#eaf3de; }
+  .ok   { color:#633806; background:#faeeda; }
+  .bad  { color:#712b13; background:#faece7; }
+
+  .close-btn { display:inline-block; margin-top:1rem; font-size:13px; color:#888; cursor:pointer; border:0.5px solid #d3d1c7; border-radius:99px; padding:4px 14px; background:#fff; }
+  .close-btn:hover { background:#f1efe8; }
+
+  .quiz-panel {
+    display: none; background: #f9f7f4; border: 0.5px solid #d3d1c7;
+    border-radius: 14px; padding: 2rem 2.5rem; margin-bottom: 1.5rem;
+    animation: fadeIn 0.22s ease;
+  }
+  .quiz-panel.active { display: block; }
+  .quiz-panel h2 { font-size: 1.4rem; font-weight: 700; color: #26215c; margin-bottom: 1.5rem; }
+
+  .question { margin-bottom: 1.4rem; }
+  .question p { font-size: 0.93rem; font-weight: 600; color: #2c2c2a; margin-bottom: 0.55rem; line-height: 1.5; }
+  .options label { display:flex; align-items:flex-start; gap:8px; font-size:0.88rem; color:#444; margin-bottom:6px; cursor:pointer; line-height:1.5; }
+  .options input[type="radio"] { margin-top:3px; flex-shrink:0; }
+
+  .submit-btn { background:#534ab7; color:#fff; border:none; border-radius:8px; padding:10px 22px; font-size:13.5px; font-weight:600; cursor:pointer; margin-top:0.5rem; margin-right:10px; }
+  .submit-btn:hover { background:#3c3489; }
+
+  .result-box { display:none; border-radius:10px; padding:0.9rem 1.2rem; margin-top:1rem; font-size:13.5px; font-weight:500; }
+  .result-box.show { display:block; }
+
+  @media (max-width:540px) {
+    h1 { font-size:2rem; }
+    .panel, .quiz-panel { padding:1.4rem 1.2rem; }
+    .card-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Course Page</h1>
+  <div class="faculty">Faculty: A. Swarna Latha</div>
+
+  <table>
+    <thead>
+      <tr><th>Topic</th><th>Quiz</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a onclick="openPanel('ds-content')">Introduction to Data Structures</a></td>
+        <td><a onclick="openQuiz('ds-quiz')">Quiz</a></td>
+      </tr>
+      <tr>
+        <td><a onclick="openPanel('lds-content')">Introduction to Linear Data Structures</a></td>
+        <td><a onclick="openQuiz('lds-quiz')">Quiz</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TOPIC 1 -->
+  <div id="ds-content" class="panel">
+    <h2>Introduction to Data Structures</h2>
+    <div class="tagline">Understanding how data is organised, stored, and accessed efficiently in memory</div>
+    <p><strong>A Data Structure</strong> is a way to organise and store data in a computer so it can be used efficiently. Choosing the right structure directly impacts the speed and memory usage of a program.</p>
+
+    <div class="card-grid">
+      <div class="card c-purple">
+        <div class="card-head"><div class="icon-wrap">📦</div><div><h4>What &amp; Why</h4></div></div>
+        <p>Data structures define how data is stored in memory and how operations like insert, delete, and search are performed on it.</p>
+      </div>
+      <div class="card c-teal">
+        <div class="card-head"><div class="icon-wrap">⏱️</div><div><h4>Big-O Notation</h4></div></div>
+        <p>Measures algorithm efficiency as input grows. <strong>O(1)</strong> constant, <strong>O(n)</strong> linear, <strong>O(log n)</strong> logarithmic, <strong>O(n²)</strong> quadratic.</p>
+      </div>
+      <div class="card c-blue">
+        <div class="card-head"><div class="icon-wrap">🗂️</div><div><h4>Classification</h4></div></div>
+        <p><strong>Linear</strong> — Array, Stack, Queue, Linked List. <strong>Non-Linear</strong> — Tree, Graph (hierarchical or networked).</p>
+      </div>
+      <div class="card c-amber">
+        <div class="card-head"><div class="icon-wrap">🔄</div><div><h4>Operations</h4></div></div>
+        <p>Common operations: <strong>Traversal, Insertion, Deletion, Searching, Sorting, Merging.</strong> Every structure supports these differently.</p>
+      </div>
+      <div class="card c-coral">
+        <div class="card-head"><div class="icon-wrap">💾</div><div><h4>Memory Layout</h4></div></div>
+        <p><strong>Contiguous</strong> — adjacent memory cells (Array). <strong>Non-contiguous</strong> — elements linked by pointers (Linked List).</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-head"><div class="icon-wrap">🌍</div><div><h4>Real-World Use</h4></div></div>
+        <p>Browser history (Stack), print queue (Queue), file system (Tree), Google Maps (Graph), Python dict (Hash Table).</p>
+      </div>
+    </div>
+
+    <div class="tag-row">
+      <span class="tag purple">Linear</span>
+      <span class="tag teal">Non-Linear</span>
+      <span class="tag blue">Big-O</span>
+      <span class="tag amber">Memory</span>
+      <span class="tag green">Operations</span>
+    </div>
+    <br>
+    <span class="close-btn" onclick="closeAll()">✕ Close</span>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div id="ds-quiz" class="quiz-panel">
+    <h2>Quiz — Introduction to Data Structures</h2>
+
+    <div class="question">
+      <p>1. Which of the following best defines a data structure?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> A programming language</label>
+        <label><input type="radio" name="q1" value="b"> A way to organise and store data for efficient access and modification</label>
+        <label><input type="radio" name="q1" value="c"> A type of computer hardware</label>
+        <label><input type="radio" name="q1" value="d"> An operating system component</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>2. What does O(1) time complexity mean?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Time grows with input size</label>
+        <label><input type="radio" name="q2" value="b"> Time is always zero</label>
+        <label><input type="radio" name="q2" value="c"> Time is constant regardless of input size</label>
+        <label><input type="radio" name="q2" value="d"> Time grows quadratically</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>3. Which is a non-linear data structure?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Array</label>
+        <label><input type="radio" name="q3" value="b"> Queue</label>
+        <label><input type="radio" name="q3" value="c"> Stack</label>
+        <label><input type="radio" name="q3" value="d"> Tree</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>4. Contiguous memory allocation is used by:</p>
+      <div class="options">
+        <label><input type="radio" name="q4" value="a"> Linked List</label>
+        <label><input type="radio" name="q4" value="b"> Graph</label>
+        <label><input type="radio" name="q4" value="c"> Array</label>
+        <label><input type="radio" name="q4" value="d"> Tree</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>5. Google Maps uses which data structure to find shortest paths?</p>
+      <div class="options">
+        <label><input type="radio" name="q5" value="a"> Stack</label>
+        <label><input type="radio" name="q5" value="b"> Array</label>
+        <label><input type="radio" name="q5" value="c"> Queue</label>
+        <label><input type="radio" name="q5" value="d"> Graph</label>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="gradeQuiz('ds',['q1','q2','q3','q4','q5'],['b','c','d','c','d'],'ds-result')">Submit Quiz</button>
+    <span class="close-btn" onclick="closeAll()">✕ Close</span>
+    <div id="ds-result" class="result-box"></div>
+  </div>
+
+  <!-- TOPIC 2 -->
+  <div id="lds-content" class="panel">
+    <h2>Introduction to Linear Data Structures</h2>
+    <div class="tagline">Structures where data elements are arranged sequentially, one after another</div>
+    <p>In <strong>linear data structures</strong>, elements form a sequence — each element has a unique predecessor and successor. They are stored either in contiguous memory (Array) or linked via pointers (Linked List).</p>
+
+    <div class="card-grid">
+      <div class="card c-purple">
+        <div class="card-head"><div class="icon-wrap">🔢</div><div><h4>Array</h4><div class="sub">Fixed-size · Contiguous memory</div></div></div>
+        <div class="ds-row">
+          <div class="ds-box">10</div><div class="ds-arrow">|</div>
+          <div class="ds-box">25</div><div class="ds-arrow">|</div>
+          <div class="ds-box">37</div><div class="ds-arrow">|</div>
+          <div class="ds-box">42</div>
+        </div>
+        <p>Access any element by index instantly. Size is fixed at creation. Fast read, slow insert/delete.</p>
+        <div class="tag-row"><span class="tag purple">O(1) access</span><span class="tag purple">Index-based</span></div>
+      </div>
+
+      <div class="card c-teal">
+        <div class="card-head"><div class="icon-wrap">🔗</div><div><h4>Linked List</h4><div class="sub">Dynamic · Pointer-linked nodes</div></div></div>
+        <div class="ds-row">
+          <div class="ds-box teal">10|→</div>
+          <div class="ds-box teal">25|→</div>
+          <div class="ds-box teal">37|→</div>
+          <div class="ds-box gray">NULL</div>
+        </div>
+        <p>Each node stores data + pointer to next. Dynamic size, easy insert/delete, but O(n) to search.</p>
+        <div class="tag-row"><span class="tag teal">Dynamic size</span><span class="tag teal">O(1) insert</span></div>
+      </div>
+
+      <div class="card c-coral">
+        <div class="card-head"><div class="icon-wrap">📚</div><div><h4>Stack</h4><div class="sub">LIFO — Last In, First Out</div></div></div>
+        <div style="display:flex;flex-direction:column-reverse;gap:3px;margin:0.55rem 0 0.75rem;width:fit-content;">
+          <div class="ds-box coral" style="text-align:center;min-width:130px;">Bottom → 10</div>
+          <div class="ds-box coral" style="text-align:center;min-width:130px;">25</div>
+          <div class="ds-box coral" style="text-align:center;min-width:130px;">Top → 37 ↑</div>
+        </div>
+        <p>Push adds to top, Pop removes from top. Used in undo operations and function call stack.</p>
+        <div class="tag-row"><span class="tag coral">LIFO</span><span class="tag coral">Push / Pop</span><span class="tag coral">O(1)</span></div>
+      </div>
+
+      <div class="card c-amber">
+        <div class="card-head"><div class="icon-wrap">🚶</div><div><h4>Queue</h4><div class="sub">FIFO — First In, First Out</div></div></div>
+        <div class="ds-row" style="align-items:center;">
+          <span style="font-size:11px;color:#888780;margin-right:4px;">Front→</span>
+          <div class="ds-box amber">10</div><div class="ds-arrow">|</div>
+          <div class="ds-box amber">25</div><div class="ds-arrow">|</div>
+          <div class="ds-box amber">37</div>
+          <span style="font-size:11px;color:#888780;margin-left:4px;">←Rear</span>
+        </div>
+        <p>Enqueue at rear, Dequeue from front. Used in CPU scheduling and print spoolers.</p>
+        <div class="tag-row"><span class="tag amber">FIFO</span><span class="tag amber">Enqueue / Dequeue</span><span class="tag amber">O(1)</span></div>
+      </div>
+
+      <div class="card c-blue">
+        <div class="card-head"><div class="icon-wrap">🔄</div><div><h4>Circular Queue</h4><div class="sub">Rear connects back to Front</div></div></div>
+        <p>Last position connects back to the first, forming a circle. Solves wasted space problem of a regular queue.</p>
+        <div class="tag-row"><span class="tag blue">No wasted space</span><span class="tag blue">Circular</span></div>
+      </div>
+
+      <div class="card c-green">
+        <div class="card-head"><div class="icon-wrap">↔️</div><div><h4>Deque</h4><div class="sub">Double-Ended Queue</div></div></div>
+        <p>Insert and delete from <strong>both</strong> front and rear. More flexible than a regular queue. Used in sliding window problems.</p>
+        <div class="tag-row"><span class="tag green">Both ends</span><span class="tag green">Flexible</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;color:#888780;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:0.6rem;">Complexity Comparison</p>
+    <div class="comp-wrap">
+      <table class="comp-table">
+        <thead><tr><th>Structure</th><th>Access</th><th>Search</th><th>Insert</th><th>Delete</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Array</strong></td><td><span class="mono good">O(1)</span></td><td><span class="mono ok">O(n)</span></td><td><span class="mono bad">O(n)</span></td><td><span class="mono bad">O(n)</span></td></tr>
+          <tr><td><strong>Linked List</strong></td><td><span class="mono ok">O(n)</span></td><td><span class="mono ok">O(n)</span></td><td><span class="mono good">O(1)</span></td><td><span class="mono good">O(1)</span></td></tr>
+          <tr><td><strong>Stack</strong></td><td><span class="mono ok">O(n)</span></td><td><span class="mono ok">O(n)</span></td><td><span class="mono good">O(1)</span></td><td><span class="mono good">O(1)</span></td></tr>
+          <tr><td><strong>Queue</strong></td><td><span class="mono ok">O(n)</span></td><td><span class="mono ok">O(n)</span></td><td><span class="mono good">O(1)</span></td><td><span class="mono good">O(1)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tag-row">
+      <span class="tag purple">Array</span><span class="tag teal">Linked List</span>
+      <span class="tag coral">Stack</span><span class="tag amber">Queue</span>
+      <span class="tag blue">Circular Queue</span><span class="tag green">Deque</span>
+    </div>
+    <br>
+    <span class="close-btn" onclick="closeAll()">✕ Close</span>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div id="lds-quiz" class="quiz-panel">
+    <h2>Quiz — Linear Data Structures</h2>
+
+    <div class="question">
+      <p>1. Which data structure follows LIFO order?</p>
+      <div class="options">
+        <label><input type="radio" name="lq1" value="a"> Queue</label>
+        <label><input type="radio" name="lq1" value="b"> Array</label>
+        <label><input type="radio" name="lq1" value="c"> Stack</label>
+        <label><input type="radio" name="lq1" value="d"> Linked List</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>2. In an Array, accessing an element by index has time complexity:</p>
+      <div class="options">
+        <label><input type="radio" name="lq2" value="a"> O(n)</label>
+        <label><input type="radio" name="lq2" value="b"> O(log n)</label>
+        <label><input type="radio" name="lq2" value="c"> O(n²)</label>
+        <label><input type="radio" name="lq2" value="d"> O(1)</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>3. In a Linked List, each node contains:</p>
+      <div class="options">
+        <label><input type="radio" name="lq3" value="a"> Only data</label>
+        <label><input type="radio" name="lq3" value="b"> Data and a pointer to the next node</label>
+        <label><input type="radio" name="lq3" value="c"> Only a pointer</label>
+        <label><input type="radio" name="lq3" value="d"> An index and data</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>4. CPU scheduling and print spoolers use which structure?</p>
+      <div class="options">
+        <label><input type="radio" name="lq4" value="a"> Stack</label>
+        <label><input type="radio" name="lq4" value="b"> Array</label>
+        <label><input type="radio" name="lq4" value="c"> Queue</label>
+        <label><input type="radio" name="lq4" value="d"> Tree</label>
+      </div>
+    </div>
+    <div class="question">
+      <p>5. A Circular Queue solves which problem of a regular Queue?</p>
+      <div class="options">
+        <label><input type="radio" name="lq5" value="a"> Slow search time</label>
+        <label><input type="radio" name="lq5" value="b"> Wasted memory space at the front</label>
+        <label><input type="radio" name="lq5" value="c"> Cannot store integers</label>
+        <label><input type="radio" name="lq5" value="d"> Requires sorted data</label>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="gradeQuiz('lds',['lq1','lq2','lq3','lq4','lq5'],['c','d','b','c','b'],'lds-result')">Submit Quiz</button>
+    <span class="close-btn" onclick="closeAll()">✕ Close</span>
+    <div id="lds-result" class="result-box"></div>
+  </div>
+
+</div>
+
+<script>
+  function openPanel(id) {
+    closeAll();
+    const el = document.getElementById(id);
+    el.classList.add('active');
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function openQuiz(id) {
+    closeAll();
+    const el = document.getElementById(id);
+    el.classList.add('active');
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function closeAll() {
+    document.querySelectorAll('.panel, .quiz-panel').forEach(el => el.classList.remove('active'));
+  }
+
+  function gradeQuiz(prefix, names, answers, resultId) {
+    const container = document.getElementById(resultId).closest('.quiz-panel');
+    let score = 0;
+    names.forEach((name, i) => {
+      const sel = container.querySelector('input[name="' + name + '"]:checked');
+      if (sel && sel.value === answers[i]) score++;
+    });
+    const box = document.getElementById(resultId);
+    box.classList.add('show');
+    if (score === 5) {
+      box.style.cssText = 'display:block;background:#eaf3de;color:#27500a;border-radius:10px;padding:0.9rem 1.2rem;margin-top:1rem;font-size:13.5px;font-weight:500;';
+      box.innerHTML = '🎉 Excellent! You scored <strong>' + score + '/5</strong>. Perfect score!';
+    } else if (score >= 3) {
+      box.style.cssText = 'display:block;background:#eeedfe;color:#3c3489;border-radius:10px;padding:0.9rem 1.2rem;margin-top:1rem;font-size:13.5px;font-weight:500;';
+      box.innerHTML = '👍 Good job! You scored <strong>' + score + '/5</strong>. Review the topics you missed.';
+    } else {
+      box.style.cssText = 'display:block;background:#faece7;color:#712b13;border-radius:10px;padding:0.9rem 1.2rem;margin-top:1rem;font-size:13.5px;font-weight:500;';
+      box.innerHTML = '📖 You scored <strong>' + score + '/5</strong>. Please revisit the topic and try again.';
+    }
+  }
+</script>
+</body>
+</html>

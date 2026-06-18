@@ -1,0 +1,667 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Data Structures — II Year B.Tech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #f9f7f4;
+    --surface:   #ffffff;
+    --border:    #d3d1c7;
+    --border-lt: #eceae3;
+    --text:      #2c2c2a;
+    --muted:     #5f5e5a;
+    --faint:     #888780;
+
+    --purple-bg: #eeedfe; --purple:    #534ab7; --purple-dk: #26215c;
+    --teal-bg:   #e1f5ee; --teal:      #0f6e56; --teal-dk:   #085041;
+    --blue-bg:   #e6f1fb; --blue:      #185fa5; --blue-dk:   #0c447c;
+    --amber-bg:  #faeeda; --amber:     #854f0b; --amber-dk:  #633806;
+    --coral-bg:  #faece7; --coral:     #993c1d; --coral-dk:  #712b13;
+    --green-bg:  #eaf3de; --green:     #3b6d11; --green-dk:  #27500a;
+    --pink-bg:   #fbeaf0; --pink:      #993556;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 2.5rem 1.25rem;
+    line-height: 1.6;
+  }
+
+  .page { max-width: 880px; margin: 0 auto; }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 2rem;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+
+  .pill {
+    display: inline-block;
+    background: var(--purple-bg);
+    color: var(--purple-dk);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 14px;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+  }
+
+  header h1 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--purple-dk);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  header p {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ── Tip box ── */
+  .tip-box {
+    background: var(--purple-bg);
+    border-radius: 12px;
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+  .tip-box .icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .tip-box h4 { font-size: 13px; font-weight: 600; color: var(--purple-dk); margin-bottom: 3px; }
+  .tip-box p  { font-size: 13px; color: var(--purple); line-height: 1.55; margin: 0; }
+
+  /* ── Section labels ── */
+  .section { margin-bottom: 2.8rem; }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+  }
+  .phase-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 4px 13px;
+    border-radius: 99px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .phase-line { flex: 1; height: 0.5px; background: var(--border); }
+
+  /* ── Cards ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+    gap: 13px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 13px;
+    padding: 1.2rem;
+    transition: box-shadow 0.15s ease;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.7rem;
+  }
+  .icon-wrap {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .card h3 { font-size: 14px; font-weight: 600; color: var(--text); }
+  .card .sub { font-size: 11px; color: var(--faint); margin-top: 1px; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 0.75rem; }
+
+  /* colour variants */
+  .c-purple .icon-wrap { background: var(--purple-bg); color: var(--purple); }
+  .c-teal   .icon-wrap { background: var(--teal-bg);   color: var(--teal);   }
+  .c-blue   .icon-wrap { background: var(--blue-bg);   color: var(--blue);   }
+  .c-amber  .icon-wrap { background: var(--amber-bg);  color: var(--amber);  }
+  .c-coral  .icon-wrap { background: var(--coral-bg);  color: var(--coral);  }
+  .c-green  .icon-wrap { background: var(--green-bg);  color: var(--green);  }
+  .c-pink   .icon-wrap { background: var(--pink-bg);   color: var(--pink);   }
+  .c-gray   .icon-wrap { background: var(--border-lt); color: var(--muted);  }
+
+  /* tags */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 99px;
+  }
+  .tag.purple { background: var(--purple-bg); color: var(--purple-dk); }
+  .tag.teal   { background: var(--teal-bg);   color: var(--teal-dk);   }
+  .tag.blue   { background: var(--blue-bg);   color: var(--blue-dk);   }
+  .tag.amber  { background: var(--amber-bg);  color: var(--amber-dk);  }
+  .tag.coral  { background: var(--coral-bg);  color: var(--coral-dk);  }
+  .tag.green  { background: var(--green-bg);  color: var(--green-dk);  }
+  .tag.gray   { background: var(--border-lt); color: var(--text);      }
+
+  /* ── Visual DS diagrams ── */
+  .diagram-block {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 13px;
+    padding: 1.4rem 1.6rem;
+    margin-top: 1rem;
+  }
+  .diagram-block h4 {
+    font-size: 12px; font-weight: 600; color: var(--faint);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .ds-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+  }
+
+  .ds-box {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 7px;
+    background: var(--purple-bg);
+    color: var(--purple-dk);
+    border: 1px solid #c9c6f5;
+  }
+  .ds-arrow {
+    font-size: 14px; color: var(--faint);
+    padding: 0 5px;
+  }
+
+  .ds-box.teal  { background: var(--teal-bg);  color: var(--teal-dk);  border-color: #a8dece; }
+  .ds-box.blue  { background: var(--blue-bg);  color: var(--blue-dk);  border-color: #a9cef0; }
+  .ds-box.amber { background: var(--amber-bg); color: var(--amber-dk); border-color: #e3c98a; }
+  .ds-box.coral { background: var(--coral-bg); color: var(--coral-dk); border-color: #f0b89f; }
+  .ds-box.green { background: var(--green-bg); color: var(--green-dk); border-color: #b3d98a; }
+  .ds-box.gray  { background: var(--border-lt); color: var(--muted); border-color: var(--border); }
+
+  .ds-label {
+    font-size: 11px; color: var(--faint); margin-left: 10px; font-style: italic;
+  }
+
+  /* Stack visual */
+  .stack-visual {
+    display: inline-flex;
+    flex-direction: column-reverse;
+    gap: 3px;
+    margin-bottom: 0.4rem;
+  }
+  .stack-visual .ds-box { text-align: center; min-width: 110px; }
+
+  /* Tree visual */
+  .tree-visual { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+  /* Complexity table */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    border: 0.5px solid var(--border);
+    border-radius: 13px;
+    overflow: hidden;
+  }
+  .comp-table thead tr { background: var(--bg); }
+  .comp-table th {
+    text-align: left; padding: 10px 14px;
+    font-weight: 600; font-size: 12px; color: var(--text);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .comp-table td {
+    padding: 9px 14px;
+    color: var(--muted);
+    border-bottom: 0.5px solid var(--border-lt);
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .good  { color: var(--green);  background: var(--green-bg);  border-radius: 5px; padding: 2px 8px; }
+  .ok    { color: var(--amber);  background: var(--amber-bg);  border-radius: 5px; padding: 2px 8px; }
+  .bad   { color: var(--coral);  background: var(--coral-bg);  border-radius: 5px; padding: 2px 8px; }
+
+  /* ── Quick ref table ── */
+  .ref-table-wrap {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 13px;
+    overflow: hidden;
+  }
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ref-table thead tr { background: var(--bg); }
+  .ref-table th {
+    text-align: left; padding: 11px 16px;
+    font-weight: 600; font-size: 12px; color: var(--text);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .ref-table td { padding: 10px 16px; color: var(--muted); border-bottom: 0.5px solid var(--border-lt); }
+  .ref-table tr:last-child td { border-bottom: none; }
+
+  footer {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    border-top: 0.5px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    margin-top: 1rem;
+    line-height: 1.9;
+  }
+
+  @media (max-width: 540px) {
+    header h1 { font-size: 1.6rem; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="pill">II Year B.Tech · Computer Science</div>
+    <h1>Introduction to Data Structures</h1>
+    <p>Organising data efficiently so programs can store, access, and manipulate it fast.</p>
+  </header>
+
+  <!-- Tip -->
+  <div class="tip-box">
+    <div class="icon">💡</div>
+    <div>
+      <h4>How to use this guide</h4>
+      <p>Topics follow the natural learning order — start with basics, then move to linear and non-linear structures. Each section shows a short description, a visual, and complexity at a glance.</p>
+    </div>
+  </div>
+
+  <!-- 1. Basics -->
+  <div class="section">
+    <div class="phase-header">
+      <span class="phase-badge" style="background:var(--purple-bg); color:var(--purple);">1 — Fundamentals</span>
+      <div class="phase-line"></div>
+    </div>
+    <div class="grid">
+
+      <div class="card c-purple">
+        <div class="card-head">
+          <div class="icon-wrap">📦</div>
+          <div><h3>What is a Data Structure?</h3></div>
+        </div>
+        <p>A way to organise and store data in memory so it can be used efficiently. Choosing the right structure is the first step to writing fast programs.</p>
+        <div class="tag-row">
+          <span class="tag purple">Memory</span>
+          <span class="tag purple">Organisation</span>
+          <span class="tag purple">Efficiency</span>
+        </div>
+      </div>
+
+      <div class="card c-teal">
+        <div class="card-head">
+          <div class="icon-wrap">⏱️</div>
+          <div><h3>Time &amp; Space Complexity</h3></div>
+        </div>
+        <p>Big-O notation measures how fast an algorithm grows. <strong>O(1)</strong> is constant, <strong>O(n)</strong> is linear, <strong>O(n²)</strong> is quadratic. Always aim for the lowest possible complexity.</p>
+        <div class="tag-row">
+          <span class="tag teal">Big-O</span>
+          <span class="tag teal">Performance</span>
+        </div>
+      </div>
+
+      <div class="card c-blue">
+        <div class="card-head">
+          <div class="icon-wrap">🗂️</div>
+          <div><h3>Classification</h3></div>
+        </div>
+        <p>Data structures split into <strong>Linear</strong> (Array, Stack, Queue, Linked List) where data is sequential, and <strong>Non-Linear</strong> (Tree, Graph) where data is hierarchical or networked.</p>
+        <div class="tag-row">
+          <span class="tag blue">Linear</span>
+          <span class="tag blue">Non-Linear</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. Linear -->
+  <div class="section">
+    <div class="phase-header">
+      <span class="phase-badge" style="background:var(--blue-bg); color:var(--blue);">2 — Linear Structures</span>
+      <div class="phase-line"></div>
+    </div>
+    <div class="grid">
+
+      <div class="card c-purple">
+        <div class="card-head">
+          <div class="icon-wrap">🔢</div>
+          <div>
+            <h3>Array</h3>
+            <div class="sub">Fixed-size sequential collection</div>
+          </div>
+        </div>
+        <p>Stores elements of the same type in contiguous memory. Access any element instantly by index. Size is fixed at creation.</p>
+        <div class="ds-row" style="margin:0.6rem 0 0.8rem;">
+          <div class="ds-box">10</div><div class="ds-arrow">|</div>
+          <div class="ds-box">25</div><div class="ds-arrow">|</div>
+          <div class="ds-box">37</div><div class="ds-arrow">|</div>
+          <div class="ds-box">42</div><div class="ds-arrow">|</div>
+          <div class="ds-box">58</div>
+        </div>
+        <div class="tag-row">
+          <span class="tag purple">O(1) access</span>
+          <span class="tag purple">Index-based</span>
+        </div>
+      </div>
+
+      <div class="card c-teal">
+        <div class="card-head">
+          <div class="icon-wrap">🔗</div>
+          <div>
+            <h3>Linked List</h3>
+            <div class="sub">Dynamic chain of nodes</div>
+          </div>
+        </div>
+        <p>Each <strong>node</strong> holds data and a pointer to the next node. No contiguous memory needed. Easy to insert/delete but slow to search.</p>
+        <div class="ds-row" style="margin:0.6rem 0 0.8rem;">
+          <div class="ds-box teal">10|→</div><div class="ds-arrow"></div>
+          <div class="ds-box teal">25|→</div><div class="ds-arrow"></div>
+          <div class="ds-box teal">37|→</div><div class="ds-arrow"></div>
+          <div class="ds-box gray">NULL</div>
+        </div>
+        <div class="tag-row">
+          <span class="tag teal">Dynamic size</span>
+          <span class="tag teal">O(n) search</span>
+        </div>
+      </div>
+
+      <div class="card c-coral">
+        <div class="card-head">
+          <div class="icon-wrap">📚</div>
+          <div>
+            <h3>Stack</h3>
+            <div class="sub">Last In, First Out (LIFO)</div>
+          </div>
+        </div>
+        <p>Elements are added and removed from the <strong>top</strong> only. Used in function calls, undo operations, and expression evaluation.</p>
+        <div style="margin:0.6rem 0 0.8rem; display:flex; align-items:flex-end; gap:6px;">
+          <div class="stack-visual">
+            <div class="ds-box coral">Bottom: 10</div>
+            <div class="ds-box coral">      25</div>
+            <div class="ds-box coral">Top:   37 ← Push/Pop</div>
+          </div>
+        </div>
+        <div class="tag-row">
+          <span class="tag coral">LIFO</span>
+          <span class="tag coral">Push / Pop</span>
+          <span class="tag coral">O(1)</span>
+        </div>
+      </div>
+
+      <div class="card c-amber">
+        <div class="card-head">
+          <div class="icon-wrap">🚶</div>
+          <div>
+            <h3>Queue</h3>
+            <div class="sub">First In, First Out (FIFO)</div>
+          </div>
+        </div>
+        <p>Elements enter at the <strong>rear</strong> and leave from the <strong>front</strong>. Used in CPU scheduling, print spoolers, and BFS traversal.</p>
+        <div class="ds-row" style="margin:0.6rem 0 0.8rem; align-items:center;">
+          <span style="font-size:11px; color:var(--faint); margin-right:4px;">Front →</span>
+          <div class="ds-box amber">10</div><div class="ds-arrow">|</div>
+          <div class="ds-box amber">25</div><div class="ds-arrow">|</div>
+          <div class="ds-box amber">37</div>
+          <span style="font-size:11px; color:var(--faint); margin-left:4px;">← Rear</span>
+        </div>
+        <div class="tag-row">
+          <span class="tag amber">FIFO</span>
+          <span class="tag amber">Enqueue / Dequeue</span>
+          <span class="tag amber">O(1)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. Non-Linear -->
+  <div class="section">
+    <div class="phase-header">
+      <span class="phase-badge" style="background:var(--green-bg); color:var(--green);">3 — Non-Linear Structures</span>
+      <div class="phase-line"></div>
+    </div>
+    <div class="grid">
+
+      <div class="card c-green">
+        <div class="card-head">
+          <div class="icon-wrap">🌳</div>
+          <div>
+            <h3>Tree</h3>
+            <div class="sub">Hierarchical structure</div>
+          </div>
+        </div>
+        <p>A <strong>root</strong> node branches into children. A <strong>Binary Search Tree (BST)</strong> keeps left child &lt; parent &lt; right child, enabling fast search.</p>
+        <div style="margin:0.6rem 0 0.8rem;">
+          <div class="tree-visual">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[50]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↙&nbsp;&nbsp;&nbsp;&nbsp;↘<br>
+&nbsp;&nbsp;[30]&nbsp;&nbsp;&nbsp;[70]<br>
+&nbsp;↙&nbsp;&nbsp;↘<br>
+[20]&nbsp;[40]
+          </div>
+        </div>
+        <div class="tag-row">
+          <span class="tag green">Hierarchical</span>
+          <span class="tag green">BST</span>
+          <span class="tag green">O(log n) search</span>
+        </div>
+      </div>
+
+      <div class="card c-blue">
+        <div class="card-head">
+          <div class="icon-wrap">🕸️</div>
+          <div>
+            <h3>Graph</h3>
+            <div class="sub">Network of nodes and edges</div>
+          </div>
+        </div>
+        <p>A set of <strong>vertices</strong> connected by <strong>edges</strong>. Can be directed or undirected. Used in maps, social networks, and routing algorithms.</p>
+        <div class="ds-row" style="margin:0.6rem 0 0.8rem; flex-wrap:wrap; gap:6px;">
+          <div class="ds-box blue">A</div><div class="ds-arrow">—</div>
+          <div class="ds-box blue">B</div><div class="ds-arrow">—</div>
+          <div class="ds-box blue">C</div>
+          <div style="flex-basis:100%; font-size:11px; color:var(--faint); margin-top:4px;">A also connects to C (cycle)</div>
+        </div>
+        <div class="tag-row">
+          <span class="tag blue">Vertices &amp; Edges</span>
+          <span class="tag blue">BFS / DFS</span>
+        </div>
+      </div>
+
+      <div class="card c-pink">
+        <div class="card-head">
+          <div class="icon-wrap">🔑</div>
+          <div>
+            <h3>Hash Table</h3>
+            <div class="sub">Key → Value mapping</div>
+          </div>
+        </div>
+        <p>A <strong>hash function</strong> maps a key to an index in an array. Enables near-instant lookup. Used in dictionaries, caches, and databases.</p>
+        <div class="ds-row" style="margin:0.6rem 0 0.8rem; flex-wrap:wrap; gap:6px;">
+          <div class="ds-box" style="background:var(--pink-bg); color:var(--pink); border-color:#f0b0c8;">"name"</div>
+          <div class="ds-arrow">→ h()</div>
+          <div class="ds-box" style="background:var(--pink-bg); color:var(--pink); border-color:#f0b0c8;">index 3</div>
+        </div>
+        <div class="tag-row">
+          <span class="tag" style="background:var(--pink-bg); color:var(--pink);">O(1) avg</span>
+          <span class="tag" style="background:var(--pink-bg); color:var(--pink);">Key-Value</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4. Complexity reference -->
+  <div class="section">
+    <div class="phase-header">
+      <span class="phase-badge" style="background:var(--amber-bg); color:var(--amber);">4 — Complexity Quick Reference</span>
+      <div class="phase-line"></div>
+    </div>
+    <div style="background:var(--surface); border:0.5px solid var(--border); border-radius:13px; overflow:hidden;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Structure</th>
+            <th>Access</th>
+            <th>Search</th>
+            <th>Insert</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Array</strong></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono bad">O(n)</span></td>
+            <td><span class="mono bad">O(n)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Linked List</strong></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Stack</strong></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Queue</strong></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono ok">O(n)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+          </tr>
+          <tr>
+            <td><strong>BST (avg)</strong></td>
+            <td><span class="mono ok">O(log n)</span></td>
+            <td><span class="mono ok">O(log n)</span></td>
+            <td><span class="mono ok">O(log n)</span></td>
+            <td><span class="mono ok">O(log n)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Hash Table</strong></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+            <td><span class="mono good">O(1)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:0.7rem; display:flex; gap:10px; flex-wrap:wrap;">
+      <span style="font-size:12px; color:var(--faint);">
+        <span class="mono good" style="padding:2px 7px;">O(1)</span> Constant — fastest &nbsp;
+        <span class="mono ok" style="padding:2px 7px;">O(log n) / O(n)</span> Moderate &nbsp;
+        <span class="mono bad" style="padding:2px 7px;">O(n²)</span> Slowest
+      </span>
+    </div>
+  </div>
+
+  <!-- 5. Use cases -->
+  <div class="section">
+    <div class="phase-header">
+      <span class="phase-badge" style="background:var(--teal-bg); color:var(--teal);">5 — Real-World Use Cases</span>
+      <div class="phase-line"></div>
+    </div>
+    <div class="ref-table-wrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th>Data Structure</th>
+            <th>Used In</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Array</strong></td>
+            <td>Image pixels, spreadsheets</td>
+            <td>Fast index-based access</td>
+          </tr>
+          <tr>
+            <td><strong>Linked List</strong></td>
+            <td>Browser history, music playlist</td>
+            <td>Easy insert/delete at any position</td>
+          </tr>
+          <tr>
+            <td><strong>Stack</strong></td>
+            <td>Undo/redo, function call stack</td>
+            <td>LIFO behaviour needed</td>
+          </tr>
+          <tr>
+            <td><strong>Queue</strong></td>
+            <td>Print jobs, CPU scheduling</td>
+            <td>FIFO — serve in arrival order</td>
+          </tr>
+          <tr>
+            <td><strong>Tree</strong></td>
+            <td>File systems, HTML DOM</td>
+            <td>Hierarchical data representation</td>
+          </tr>
+          <tr>
+            <td><strong>Graph</strong></td>
+            <td>Google Maps, social networks</td>
+            <td>Model connections between entities</td>
+          </tr>
+          <tr>
+            <td><strong>Hash Table</strong></td>
+            <td>Python dict, database indexes</td>
+            <td>O(1) average key lookup</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <div>Introduction to Data Structures · II Year B.Tech · Computer Science</div>
+    <div>Compiled for academic reference · All complexity values show average-case</div>
+  </footer>
+
+</div>
+</body>
+</html>
